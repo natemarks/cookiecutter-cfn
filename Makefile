@@ -60,6 +60,9 @@ else
 	$(info Current Branch: $(CURRENT_BRANCH), main: $(MAIN_BRANCH))
 endif
 
+shellcheck:
+	find . -type f -name "*.sh" -exec "shellcheck" "--format=gcc" {} \;
+
 run: ## run cookiecutter into a temp directory
 	TD=$$(mktemp -d); \
 	echo $$TD; \
