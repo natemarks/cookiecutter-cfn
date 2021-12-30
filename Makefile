@@ -39,14 +39,14 @@ rebase: git-status ## rebase current feature branch on to the default branch
 test: git-status pylint ## Run all project tests
 	( \
        . .venv/bin/activate; \
-       pip install pytest-testinfra cookiecutter; \
+       pip install -r requirements_dev.txt; \
        python3 -m pytest -o log_cli=true -v test; \
     )
 
 pylint: ## run  all of the static checks
 	( \
        . .venv/bin/activate; \
-       pip install pylint; \
+       pip install -r requirements_dev.txt; \
        pylint test/*.py; \
     )
 
