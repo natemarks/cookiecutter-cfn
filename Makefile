@@ -36,7 +36,7 @@ undo_edits: ## undo staged and unstaged change. ohmyzsh alias: grhh
 rebase: git-status ## rebase current feature branch on to the default branch
 	git fetch && git rebase origin/$(DEFAULT_BRANCH)
 
-test: git-status pylint ## Run all project tests
+test: pylint ## Run all project tests
 	( \
        . .venv/bin/activate; \
        pip install -r requirements_dev.txt; \
@@ -50,7 +50,7 @@ pylint: ## run  all of the static checks
        pylint test/*.py; \
     )
 
-bump: ## bump version in main branch
+bump: git-status ## bump version in main branch
 ifeq ($(CURRENT_BRANCH), $(MAIN_BRANCH))
 	( \
 	   . .venv/bin/activate; \

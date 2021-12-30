@@ -38,7 +38,7 @@ class TestClass:  # pylint: disable=R0903
         self, host, tmp_path, ccinput
     ):  # pylint: disable=R0201
         """Iterate on different cookiecutter json overrides"""
-        role_dir=str(tmp_path) + "/" + "cfn-" + ccinput["role_name"]
+        role_dir=str(tmp_path) + "/" + "cfn-" + ccinput["module_name"]
         os.chdir(tmp_path)
         log.info("tmpdir: %s", str(tmp_path))
         cookiecutter(
