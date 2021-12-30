@@ -19,7 +19,7 @@ clean-venv: ## re-create virtual env
 	python3 -m venv .venv
 	( \
        . .venv/bin/activate; \
-       pip install -r requirements.txt; \
+       pip install --upgrade pip setuptools; \
     )
 
 git-status: ## require status is clean so we can use undo_edits to put things back
