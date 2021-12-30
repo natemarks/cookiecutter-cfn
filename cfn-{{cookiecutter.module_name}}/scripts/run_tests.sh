@@ -21,8 +21,8 @@ EOF
 
 cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
-  msg "${GREEN}CLeauning up (deleting) stack${NOFORMAT}"
-  #aws cloudformation delete-stack --stack-name myteststack
+  msg "${GREEN}Cleaning up (deleting) stack: ${STACK_NAME}${NOFORMAT}"
+  aws cloudformation delete-stack --stack-name "${STACK_NAME}"
 }
 
 setup_colors() {
@@ -121,8 +121,8 @@ upload_templates() {
 # upload_templates 
 create_stack() {
   aws cloudformation create-stack \
-  --stack-name myteststack \
-  --template-body "file://templates/vpc/control/control.json"
+  --stack-name "${STACK_NAME}" \
+  --template-body "file://vpc.json"
 }
 
 wait_for_continue() {
@@ -134,8 +134,10 @@ wait_for_continue() {
   done
 }
 
-
-#aws cloudformation wait stack-create-complete --stack-name "myteststack"
-msg "${GREEN}Creating Stack${NOFORMAT}"
+STACK_NAME="deleteme_cfn_vpc"
+declare -r STACK_NAME
+create_stack
+aws cloudformation wait stack-create-complete --stack-name "${STACK_NAME}"
+msg "${GREEN}Creating Stack: ${STACK_NAME}${NOFORMAT}"
 wait_for_continue
 
