@@ -134,7 +134,7 @@ wait_for_continue() {
   done
 }
 
-STACK_NAME="deleteme_cfn_vpc"
+STACK_NAME="deleteme-cfn-vpc"
 declare -r STACK_NAME
 create_stack
 aws cloudformation wait stack-create-complete --stack-name "${STACK_NAME}"
