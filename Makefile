@@ -40,7 +40,7 @@ test: pylint ## Run all project tests
 	( \
        . .venv/bin/activate; \
        pip install -r requirements_dev.txt; \
-       python3 -m pytest -o log_cli=true -v test; \
+       python3 -m pytest -s -o log_cli=true -v test; \
     )
 
 pylint: ## run  all of the static checks
