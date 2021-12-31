@@ -46,7 +46,15 @@ class TestClass:  # pylint: disable=R0903
             no_input=True,
             extra_context=ccinput,
         )
-        #  check env file
+        #  check taskcat file
         taskcat_cfg = host.file(role_dir + '/.taskcat.yml')
         assert taskcat_cfg.exists
         assert taskcat_cfg.contains('name: cfn-'+str(ccinput["module_name"]))
+        #  check run_topic.json.sh
+        run_topic = host.file(role_dir + '/scripts/run_topic.json.sh')
+        assert run_topic.exists
+        assert run_topic.contains('STACK_NAME="deleteme-cfn-'+str(ccinput["module_name"]))
+        #  check Makefile
+        makefile = host.file(role_dir + '/Makefile')
+        assert makefile.exists
+        assert makefile.contains('PROJECT := '+str(ccinput["module_name"]))

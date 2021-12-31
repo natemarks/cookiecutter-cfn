@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-
+PROJECT := {{ cookiecutter.module_name }}
 # Determine this makefile's path.
 # Be sure to place this BEFORE `include` directives, if any.
 DEFAULT_BRANCH := main
@@ -70,5 +70,5 @@ rebase: git-status ## rebase current feature branch on to the default branch
 
 shellcheck:
 	find scripts -type f -name "*.sh" -exec "shellcheck" "--format=gcc" {} \;
-	
+
 .PHONY: build release static  lint test

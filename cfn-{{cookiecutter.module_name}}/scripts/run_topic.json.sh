@@ -2,6 +2,13 @@
 set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
 
+
+STACK_NAME="deleteme-cfn-{{ cookiecutter.module_name}}"
+declare -r STACK_NAME
+
+TEMPLATE_FILE="topic.json"
+declare -r TEMPLATE_FILE
+
 usage() {
   cat <<EOF
 Usage: run_tests.sh [-h] [-v] -b bucket -r region -p project
@@ -122,7 +129,7 @@ upload_templates() {
 create_stack() {
   aws cloudformation create-stack \
   --stack-name "${STACK_NAME}" \
-  --template-body "file://vpc.json"
+  --template-body "file://${TEMPLATE_FILE}"
 }
 
 wait_for_continue() {
@@ -134,8 +141,6 @@ wait_for_continue() {
   done
 }
 
-STACK_NAME="deleteme-cfn-vpc"
-declare -r STACK_NAME
 create_stack
 aws cloudformation wait stack-create-complete --stack-name "${STACK_NAME}"
 msg "${GREEN}Creating Stack: ${STACK_NAME}${NOFORMAT}"
