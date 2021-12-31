@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-PROJECT := {{ cookiecutter.module_name }}
+PROJECT := cfn-{{ cookiecutter.module_name }}
 # Determine this makefile's path.
 # Be sure to place this BEFORE `include` directives, if any.
 DEFAULT_BRANCH := main

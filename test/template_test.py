@@ -57,4 +57,4 @@ class TestClass:  # pylint: disable=R0903
         #  check Makefile
         makefile = host.file(role_dir + '/Makefile')
         assert makefile.exists
-        assert makefile.contains('PROJECT := '+str(ccinput["module_name"]))
+        assert makefile.contains('PROJECT := cfn-'+str(ccinput["module_name"]))
