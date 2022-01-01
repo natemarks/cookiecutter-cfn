@@ -22,6 +22,18 @@ clean-venv: ## re-create virtual env
        pip install --upgrade pip setuptools; \
     )
 
+
+cfn-init: ## https://aws.amazon.com/blogs/mt/introducing-aws-cloudformation-modules/
+	( \
+       source .venv/bin/activate; \
+       pip install pip install cloudformation-cli \
+       cloudformation-cli-java-plugin \
+       cloudformation-cli-go-plugin \
+       cloudformation-cli-python-plugin \
+       cloudformation-cli-typescript-plugin; \
+       cfn init ; \
+    )
+
 test: ## run pytest/taskcat with assertions
 	( \
 	   source .venv/bin/activate; \
