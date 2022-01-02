@@ -37,7 +37,7 @@ cfn-init: ## https://aws.amazon.com/blogs/mt/introducing-aws-cloudformation-modu
 
 test: ## run go test
 	( \
-		 go mod init github.com/{{ cookiecutter.github_user }}/{{ cookiecutter.module_name }}
+		 go mod init github.com/{{ cookiecutter.github_user }}/{{ cookiecutter.module_name }} || true
 		 go mod tidy
 		 go test -v
 	)
