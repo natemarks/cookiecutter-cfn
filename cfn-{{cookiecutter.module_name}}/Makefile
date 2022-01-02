@@ -35,13 +35,22 @@ cfn-init: ## https://aws.amazon.com/blogs/mt/introducing-aws-cloudformation-modu
        cfn init ; \
     )
 
-test: ## run pytest/taskcat with assertions
+test: ## run go test
+	( \
+		 go mod init github.com/{{ cookiecutter.github_user }}/{{ cookiecutter.module_name }}
+		 go mod tidy
+		 go test -v
+	)
+
+
+pytest-taskcat: ## run pytest/taskcat with assertions
 	( \
 	   source .venv/bin/activate; \
 	   pip install boto3 taskcat pytest; \
 	   pytest -v; \
+		 go mod init github.com/{{ cookiecutter.github_user }}/{{ cookiecutter.module_name }}
+		 go mod tidy
 	)
-
 quick-test: ## run taskcat to smoke test stack creation
 	( \
 	   source .venv/bin/activate; \
