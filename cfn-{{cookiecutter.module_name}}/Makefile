@@ -100,5 +100,7 @@ ${TEMPLATES}:
 
 publish: ${TEMPLATES} ## publish templates to public bucket
 
+undo_edits: ## undo staged and unstaged change. ohmyzsh alias: grhh
+	git reset --hard
 
 .PHONY: build release static  lint test publish ${TEMPLATES}

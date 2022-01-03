@@ -78,4 +78,7 @@ run: ## run cookiecutter into a temp directory
 			 tree $$TD; \
     )
 
+undo_edits: ## undo staged and unstaged change. ohmyzsh alias: grhh
+	git reset --hard
+
 .PHONY: static shellcheck test
