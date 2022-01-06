@@ -1,5 +1,5 @@
 project:
-  name: {{ cookiecutter.__project_slug}}
+  name: cfn-{{ cookiecutter.module_name }}
   regions:
   - us-east-2
 tests:

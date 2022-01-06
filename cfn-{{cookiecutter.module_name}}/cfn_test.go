@@ -1,3 +1,4 @@
+{% raw -%}
 package cloudformation
 
 import (
@@ -21,14 +22,14 @@ func TestCreateStack(t *testing.T) {
 		wantErr     bool
 	}{
 		{name: "valid", args: args{input: &cloudformation.CreateStackInput{
-			StackName:                   aws.String("{{ cookiecutter.module_name }}-test-create-stack-valid"),
+			StackName:                   aws.String("cfn-vnc-test-create-stack-valid"),
 			Capabilities:                nil,
 			ClientRequestToken:          nil,
 			DisableRollback:             nil,
 			EnableTerminationProtection: nil,
 			NotificationARNs:            nil,
 			OnFailure:                   "",
-			Parameters:                  []types.Parameter{{ParameterKey: aws.String("BucketName"), ParameterValue: aws.String("natemarks-test-create-stack-valid-2874gf8b24byv")}},
+			Parameters:                  []types.Parameter{{ParameterKey: aws.String("Owner"), ParameterValue: aws.String("natemarks-cfn-vpc-valid-2874gf8b24byv")}},
 			ResourceTypes:               nil,
 			RoleARN:                     nil,
 			RollbackConfiguration:       nil,
@@ -36,11 +37,11 @@ func TestCreateStack(t *testing.T) {
 			StackPolicyURL:              nil,
 			Tags:                        []types.Tag{{Key: aws.String("deleteme"), Value: aws.String("true")}},
 			TemplateBody:                nil,
-			TemplateURL:                 aws.String("https://natemarks-cloudformation-public.s3.amazonaws.com/cfn-s3buckets/private.json"),
+			TemplateURL:                 aws.String("https://natemarks-cloudformation-public.s3.amazonaws.com/cfn-vpc/vpc.json"),
 			TimeoutInMinutes:            nil,
 		}},
 			wantErr:     false,
-			wantStackId: "{{ cookiecutter.module_name }}-test-create-stack-valid"},
+			wantStackId: "cfn-vnc-test-create-stack-valid"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -58,3 +59,4 @@ func TestCreateStack(t *testing.T) {
 		_ = cfn.DeleteStack(tt.wantStackId)
 	}
 }
+{% endraw -%}

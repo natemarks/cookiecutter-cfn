@@ -3,15 +3,15 @@ set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
 
 
-STACK_NAME="deleteme-{{ cookiecutter.__project_slug}}-test"
+STACK_NAME="deleteme-cfn-{{ cookiecutter.module_name }}-test"
 declare -r STACK_NAME
 
-TEMPLATE_FILE="{{ cookiecutter.module_name}}.json"
+TEMPLATE_FILE="{{ cookiecutter.module_name }}.json"
 declare -r TEMPLATE_FILE
 
 usage() {
   cat <<EOF
-Usage: create_and_teardown.sh [-h] [-v] -b bucket -r region -p project
+Usage: create_and_teardown.sh [-h] [-v]
 
 Create and delete the project stack and whatever test fixture stacks are required to test it
 
@@ -25,9 +25,6 @@ Available options:
 
 -h, --help      Print this help and exit  
 -v, --verbose   Print script debug info
--b, --bucket    upload templates to this bucket to run them
--r  --region    AWS region to run tests
--p  --project   Name of the project
 EOF
   exit
 }
@@ -64,46 +61,25 @@ die() {
 }
 
 parse_params() {
-  # default values of variables set from params
-  bucket=''
-  region=''
-  project=''
 
   while :; do
     case "${1-}" in
     -h | --help) usage ;;
     -v | --verbose) set -xv ;;
     --no-color) NO_COLOR=1 ;;
-    -b | --bucket) # bucket name
-      bucket="${2-}"
-      shift
-      ;;
-    -r | --region) # AWS region
-      region="${2-}"
-      shift
-      ;;
-    -p | --project) # project name
-      project="${2-}"
-      shift
-      ;;
     -?*) die "Unknown option: $1" ;;
     *) break ;;
     esac
     shift
   done
 
-  # check required params and arguments
-  #[[ -z "${bucket-}" ]] && die "Missing required parameter: bucket"
-  #[[ -z "${region-}" ]] && die "Missing required parameter: region"
-  #[[ -z "${project-}" ]] && die "Missing required parameter: project"
 
   return 0
 }
 
 parse_params "$@"
 setup_colors
-COMMIT="$(git rev-parse HEAD)"
-declare -r COMMIT
+
 # script logic here
 
 # create the stack under test. it exports output data for cross-stack references

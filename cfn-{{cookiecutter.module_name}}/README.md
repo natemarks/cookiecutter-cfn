@@ -48,7 +48,6 @@ vpc.json. The test_vpc.json does the following:
 NOTE: There are no tests for the private subnets, but I'll probably tackle that through a custom go test eventually. I
 don't expect to have instances on those subnets, so I don't really need to test VPC endpoint access (for session
 manager) from them either. I expect they're for things like RDS.  
-![](network-reachability-test-limit.png)
 
 **manual testing with the test stack**
 NOTE: The test stack creates 18 reachability test paths all at once. the default limit is 5 concurrent. You might want
@@ -79,7 +78,6 @@ Finished destroying stack: deleteme-cfn-vpc-test
 While the stacks are up, you can check the status of the availability tests by going to the vpn console and looking at
 the Reachability Analyzer. It should have 18 test paths from all 6 instances to each of the 3 VPC endpoints for a total
 of 18 like this:
-![](network_reachability.png)
 
 To shell into a test instance, use SSM. You can either use session manager from the aws console or from the cli like
 this:

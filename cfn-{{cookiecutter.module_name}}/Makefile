@@ -12,7 +12,7 @@ CURRENT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 DEFAULT_BRANCH := main
 
 PUBLISH_BUCKET := natemarks-cloudformation-public
-PROJECT := cfn-vpc
+PROJECT := cfn-{{ cookiecutter.module_name }}
 TEMPLATES := $(shell ls *.json)
 
 help: ## Show this help.

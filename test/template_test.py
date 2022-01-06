@@ -50,10 +50,14 @@ class TestClass:  # pylint: disable=R0903
         taskcat_cfg = host.file(role_dir + '/.taskcat.yml')
         assert taskcat_cfg.exists
         assert taskcat_cfg.contains('name: cfn-'+str(ccinput["module_name"]))
-        #  check run_topic.json.sh
-        run_topic = host.file(role_dir + '/scripts/run_topic.json.sh')
-        assert run_topic.exists
-        assert run_topic.contains('STACK_NAME="deleteme-cfn-'+str(ccinput["module_name"]))
+        #  check create_and_teardown.sh
+        create_and_teardown = host.file(role_dir + '/scripts/create_and_teardown.sh')
+        assert create_and_teardown.exists
+        assert create_and_teardown.contains('STACK_NAME="deleteme-cfn-'+str(ccinput["module_name"]))
+        #  check create_and_teardown.sh
+        create_only = host.file(role_dir + '/scripts/create_only.sh')
+        assert create_only.exists
+        assert create_only.contains('STACK_NAME="deleteme-cfn-'+str(ccinput["module_name"]))
         #  check Makefile
         makefile = host.file(role_dir + '/Makefile')
         assert makefile.exists
