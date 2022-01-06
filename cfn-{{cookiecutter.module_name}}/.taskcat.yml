@@ -1,9 +1,11 @@
 project:
-  name: cfn-{{cookiecutter.module_name}}
+  name: {{ cookiecutter.__project_slug}}
   regions:
   - us-east-2
 tests:
   default:
-    template: ./topic.json
+    template: ./{{cookiecutter.module_name}}.json
     parameters:
-      NotificationTopicName: gggtopic
+      Owner: CCOwner
+      Environment: CCEnvironment
+      Project: CCProject

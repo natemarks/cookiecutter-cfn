@@ -2,5 +2,6 @@
   "module_name": "my-module",
   "github_user": "natemarks",
   "author": "Nate Marks",
-  "publish_bucket": "natemarks-cloudformation-public"
+  "publish_bucket": "natemarks-cloudformation-public",
+  "__project_slug": "cfn-{{ cookiecutter.module_name|lower|replace('_', '-') }}"
 }

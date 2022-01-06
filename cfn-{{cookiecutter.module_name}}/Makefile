@@ -1,16 +1,19 @@
 .DEFAULT_GOAL := help
-PROJECT := cfn-{{ cookiecutter.module_name }}
+
 # Determine this makefile's path.
 # Be sure to place this BEFORE `include` directives, if any.
 DEFAULT_BRANCH := main
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-VERSION := 0.0.0
+VERSION := 0.0.5
 COMMIT := $(shell git rev-parse HEAD)
 CDIR = $(shell pwd)
-PUBLISH_BUCKET := {{ cookiecutter.publish_bucket }}
 
 CURRENT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 DEFAULT_BRANCH := main
+
+PUBLISH_BUCKET := natemarks-cloudformation-public
+PROJECT := cfn-vpc
+TEMPLATES := $(shell ls *.json)
 
 help: ## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
@@ -23,34 +26,18 @@ clean-venv: ## re-create virtual env
        pip install --upgrade pip setuptools; \
     )
 
-
-cfn-init: ## https://aws.amazon.com/blogs/mt/introducing-aws-cloudformation-modules/
-	( \
-       source .venv/bin/activate; \
-       pip install pip install cloudformation-cli \
-       cloudformation-cli-java-plugin \
-       cloudformation-cli-go-plugin \
-       cloudformation-cli-python-plugin \
-       cloudformation-cli-typescript-plugin; \
-       cfn init ; \
-    )
-
-test: ## run go test
-	( \
-		 go mod init github.com/{{ cookiecutter.github_user }}/{{ cookiecutter.module_name }} || true
-		 go mod tidy
-		 go test -v
-	)
-
-
 pytest-taskcat: ## run pytest/taskcat with assertions
 	( \
 	   source .venv/bin/activate; \
 	   pip install boto3 taskcat pytest; \
 	   pytest -v; \
-		 go mod init github.com/{{ cookiecutter.github_user }}/{{ cookiecutter.module_name }}
-		 go mod tidy
 	)
+
+test: ## run go test
+	go mod init github.com/natemarks/cfn-vpc || true
+	go mod tidy
+	go test -v
+
 quick-test: ## run taskcat to smoke test stack creation
 	( \
 	   source .venv/bin/activate; \
@@ -59,7 +46,7 @@ quick-test: ## run taskcat to smoke test stack creation
 	)
 
 lint:  ##  run cfn validate
-	aws cloudformation validate-template --template-body file://topic.json
+	$(foreach var,$(TEMPLATES),aws cloudformation validate-template --template-body file://$(var);)
 
 fmt: ## run gofmt
 	@go fmt ${PKG_LIST}
@@ -93,14 +80,16 @@ rebase: git-status ## rebase current feature branch on to the default branch
 shellcheck:
 	find scripts -type f -name "*.sh" -exec "shellcheck" "--format=gcc" {} \;
 
-${TEMPLATES}:
-	aws s3api put-object --bucket $(PUBLISH_BUCKET) \
-	--key $(PROJECT)/ ; \
-	aws s3 cp $@ s3://$(PUBLISH_BUCKET)/$(PROJECT)/$@ ; \
-
-publish: ${TEMPLATES} ## publish templates to public bucket
-
 undo_edits: ## undo staged and unstaged change. ohmyzsh alias: grhh
 	git reset --hard
 
-.PHONY: build release static  lint test publish ${TEMPLATES}
+publish: git-status ## copy the ${TEMPLATES} files to the public s3 location
+	aws s3api put-object --bucket $(PUBLISH_BUCKET) \
+	--key $(PROJECT)/ ; \
+	aws s3api put-object --bucket $(PUBLISH_BUCKET) \
+	--key $(PROJECT)/$(VERSION)/ ; \
+	$(foreach var,$(TEMPLATES),aws s3 cp $(var) s3://$(PUBLISH_BUCKET)/$(PROJECT)/$(var);)
+
+	$(foreach var,$(TEMPLATES),aws s3 cp $(var) s3://$(PUBLISH_BUCKET)/$(PROJECT)/$(VERSION)/$(var);)
+
+.PHONY: build release static  lint test publish

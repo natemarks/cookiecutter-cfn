@@ -3,17 +3,21 @@ set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
 
 
-STACK_NAME="deleteme-cfn-{{ cookiecutter.module_name}}"
+STACK_NAME="deleteme-{{ cookiecutter.__project_slug}}-test"
 declare -r STACK_NAME
 
-TEMPLATE_FILE="topic.json"
+TEMPLATE_FILE="{{ cookiecutter.module_name}}.json"
 declare -r TEMPLATE_FILE
 
 usage() {
   cat <<EOF
-Usage: run_tests.sh [-h] [-v] -b bucket -r region -p project
+Usage: create_only.sh [-h] [-v] -b bucket -r region -p project
 
-Upload the templates to a bucket and run all of the test iterations
+Create the project stack and whatever test fixture stacks are required to test it. This in intended to let the user
+iterate on the test fixture stack by manually re-creating or updating it
+
+ - create the project stack and wait for it to finish
+ - create the test fixture stack and wait for it to finish
 
 Available options:
 
@@ -28,8 +32,8 @@ EOF
 
 cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
-  msg "${GREEN}Cleaning up (deleting) stack: ${STACK_NAME}${NOFORMAT}"
-  aws cloudformation delete-stack --stack-name "${STACK_NAME}"
+  msg "${GREEN}Skipping cleanup: test-${STACK_NAME}${NOFORMAT}"
+  msg "${GREEN}Skipping cleanup: ${STACK_NAME}${NOFORMAT}"
 }
 
 setup_colors() {
@@ -95,42 +99,22 @@ COMMIT="$(git rev-parse HEAD)"
 declare -r COMMIT
 # script logic here
 
-msg "${RED}Read parameters:${NOFORMAT}"
-msg "- bucket: ${bucket}"
-msg "- region: ${region}"
-msg "- project: ${project}"
-
-# s3_path_exists com.imprivata.709310380790.us-east-1.cloudformation-templates/my_dir
-# if s3_path_exists "some_bucket/some_dir"; then
-#   msg "${RED}Bucket path already exists: some_bucket/some_dir ${NOFORMAT}"
-#   exit 1
-# fi
-s3_path_exists() {
-  aws s3 ls "s3://${1}"
-  status=$?
-  if [ $status -eq 0 ]
-  then
-    true
-  else
-    false
-  fi
-}
-
-upload_templates() {
-  msg "${GREEN}Uploading to: ${bucket}/cfntest/${project}/${COMMIT} ${NOFORMAT}"
-  if s3_path_exists "${bucket}/cfntest/${project}/${COMMIT}"; then
-    msg "${RED}Bucket path already exists: ${bucket} ${NOFORMAT}"
-    exit 1
-  fi
-  aws s3 cp templates "s3://${bucket}/cfntest/${project}/${COMMIT}" --recursive
-}
-
-# upload_templates 
+# create the stack under test. it exports output data for cross-stack references
 create_stack() {
   aws cloudformation create-stack \
+  --capabilities CAPABILITY_NAMED_IAM \
   --stack-name "${STACK_NAME}" \
   --template-body "file://${TEMPLATE_FILE}"
 }
+
+# after the stack is created, create the test stack whcih creates resources required to test
+# the stack under test. it uses cross stack references with data exported from the stack under test
+create_test_stack() {
+   aws cloudformation create-stack \
+   --capabilities CAPABILITY_NAMED_IAM \
+   --stack-name "test-${STACK_NAME}" \
+   --template-body "file://test_${TEMPLATE_FILE}"
+ }
 
 wait_for_continue() {
   msg "${GREEN}Press any key to continue to stack deletion${NOFORMAT}"
@@ -141,8 +125,15 @@ wait_for_continue() {
   done
 }
 
-create_stack
-aws cloudformation wait stack-create-complete --stack-name "${STACK_NAME}"
 msg "${GREEN}Creating Stack: ${STACK_NAME}${NOFORMAT}"
-wait_for_continue
+create_stack
+msg "${GREEN}Waiting for Stack to finish: ${STACK_NAME}${NOFORMAT}"
+aws cloudformation wait stack-create-complete --stack-name "${STACK_NAME}"
 
+
+msg "${GREEN}Creating Test Stack: test-${STACK_NAME}${NOFORMAT}"
+create_test_stack
+msg "${GREEN}Waiting for Test Stack to finish: test-${STACK_NAME}${NOFORMAT}"
+aws cloudformation wait stack-create-complete --stack-name "test-${STACK_NAME}"
+
+# the script runs the cleanup function before exiting
